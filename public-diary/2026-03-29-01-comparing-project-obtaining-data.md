@@ -1,6 +1,7 @@
-# Project Diary
+Project Diary
+=============
 
-## A Quick Background Note
+# A Quick Background Note
 
 For clarity and transparency, when I first began outlining this project and before I had started posting anything online, I discussed my project ideas with Claude AI. 
 
@@ -10,7 +11,7 @@ In the end, with the help of Claude, I narrowed down my options to three primary
 
 These ideas were the basis of a conversation with my mentor, where we decided to focus on the `O*NET` and `BLS Wage` datasets.
 
-## Step One : Downloading Datasets
+# Step One : Deciding on Downloading Datasets
 
 Beginning with the `O*NET` dataset, I am looking at the collection of files. There are many different options and, at this stage, I'm not sure what is and is not relevant.
 
@@ -94,5 +95,65 @@ Want me to take a look at the DDL structure if you paste a sample? I can tell yo
 ```
 
 I think we're going to try to let Claude handle the conversion. I'll upload each file and we'll write a replacement script that can be run in Vim to handle any changes, then check the final result in PostgreSQL and PgAdmin4.
+
+# Converting and Importing Files Into PostgreSQL
+
+I ask Claude if we should proceed through the files in numerical order.
+
+```
+Numerical order makes sense for one reason: the early files (01–10) look like reference/lookup tables, and the later files depend on them via foreign keys. Loading in order respects that dependency chain and avoids constraint errors.
+
+That said, before we dive in — what's your goal here? A few options:
+
+1. **Convert all 40 files** to PostgreSQL DDL, then load everything
+2. **Convert only the tables you need** for your capstone analysis and skip the rest
+3. **Inspect a few files first** to assess how much conversion work is actually involved
+
+For a capstone focused on training requirements, work styles, and wages cross-referenced with income, you likely only need a subset — probably something like:
+
+- 03_occupation_data (the spine)
+- 11_abilities, 12_education_training_experience, 16_skills (training investment side)
+- 21_work_styles, 22_work_values (work style side)
+- 14_job_zones (proxy for training level)
+- 02_job_zone_reference, 04_scales_reference (reference tables those depend on)
+
+Plus whatever BLS wage tables you're joining on the other side.
+
+Loading all 40 is doable but adds setup time for tables you may never query. Would you like to scope it down first, or do you want the full schema available for exploratory flexibility?
+```
+
+I don't really know what's relevant at this stage. 
+
+My bigger concern is that, were I to start with skipping tables, I may find myself lost later and not know why. I could end up losing more time that way. 
+
+The route I choose at this stage is to be thorough until I am able to discern relevancy. With familiarity, I might be able to start skipping files. 
+
+Let's start at the beginning, `01...`, and work forwards.
+
+## Small Aside in My Diary
+
+Fairbanks weather is warming up. The chimney in my house is destroyed and I have it wrapped up with a black garbage bag so that the air doesn't go up the chute. With the air warming up, the ice collected inside the chute is melting. This makes for drips of water dripping down onto my black garbage bag as I work. 'Plat. Plat. Plat.' The sound echoes the clattering of my keyboard.
+
+A large piece of ice or something inside the chute just broke off and pummeled into the black garbage bag, leaving a stretched imprint where the sharp point almost broke through the black plastic.
+
+# Creating a Script for Conversion
+
+Claude wrote an initial draft of the script, found in this file here:
+
+```
+./raw-data/scripts/2026-03-29-00-mysql-to-postgres.py
+```
+
+# Delay
+
+My OS is OpenMandriva ROME. There were some breaking changes in a recent update. Fixing it was a challenge. Claude helped me through it.
+
+# Running the script
+
+Everything ran fine.
+
+I suggested to Claude that we keep both BLS and ONET in the same database, with different schema names, to keep the joining process easier.
+
+Going into `psql` mode to run these files. I'll place them in `/tmp` so that `postgres` can access them as they're generated.
 
 

@@ -1,3 +1,5 @@
+SET search_path TO onet;
+
 CREATE TABLE content_model_reference (
   element_id CHARACTER VARYING(20) NOT NULL,
   element_name CHARACTER VARYING(150) NOT NULL,

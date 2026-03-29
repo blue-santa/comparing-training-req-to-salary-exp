@@ -1,3 +1,5 @@
+SET search_path TO onet;
+
 CREATE TABLE job_zone_reference (
   job_zone DECIMAL(1,0) NOT NULL,
   name CHARACTER VARYING(60) NOT NULL,

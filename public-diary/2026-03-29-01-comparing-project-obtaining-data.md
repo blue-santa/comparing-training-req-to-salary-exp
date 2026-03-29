@@ -154,6 +154,161 @@ Everything ran fine.
 
 I suggested to Claude that we keep both BLS and ONET in the same database, with different schema names, to keep the joining process easier.
 
-Going into `psql` mode to run these files. I'll place them in `/tmp` so that `postgres` can access them as they're generated.
+---
 
+The conversion process didn't show any errors.
 
+Imported the `01...` file and the result showed `630` rows, so we're getting some kind of result.
+
+We imported the first 10 with a for loop.
+
+```
+for f in 02_job_zone_reference.sql \
+          03_occupation_data.sql \
+          04_scales_reference.sql \
+          05_ete_categories.sql \
+          06_level_scale_anchors.sql \
+          07_occupation_level_metadata.sql \
+          08_survey_booklet_locations.sql \
+          09_task_categories.sql \
+          10_work_context_categories.sql; do
+    echo "Importing $f..."
+    sudo -u postgres /usr/local/pgsql/bin/psql -d train_reward_compare -f "$f"
+    echo "Done: $f"
+done
+```
+
+Checking now for row counts.
+
+```
+sudo -u postgres /usr/local/pgsql/bin/psql -d train_reward_compare -c "
+SELECT schemaname, relname AS tablename, n_live_tup AS row_count
+FROM pg_stat_user_tables
+WHERE schemaname = 'onet'
+ORDER BY relname;"
+```
+
+```
+ schemaname |         tablename         | row_count
+------------+---------------------------+-----------
+ onet       | content_model_reference   |       630
+ onet       | ete_categories            |        41
+ onet       | job_zone_reference        |         4
+ onet       | level_scale_anchors       |       483
+ onet       | occupation_data           |      1016
+ onet       | occupation_level_metadata |     32202
+ onet       | scales_reference          |        31
+ onet       | survey_booklet_locations  |       211
+ onet       | task_categories           |         7
+ onet       | work_context_categories   |       281
+(10 rows)
+```
+
+Revised loop script suppresses `INSERT ... ` output.
+
+```
+for f in 11_abilities.sql \
+          12_education_training_experience.sql \
+          13_interests.sql \
+          14_job_zones.sql \
+          15_knowledge.sql \
+          16_skills.sql \
+          17_task_statements.sql \
+          18_task_ratings.sql \
+          19_work_activities.sql \
+          20_work_context.sql; do
+    echo "Importing $f..."
+    sudo -u postgres /usr/local/pgsql/bin/psql -d train_reward_compare -f "$f" 2>&1 | grep -v "^INSERT" | grep -v "^$"
+    echo "Done: $f"
+done
+```
+
+---
+
+Everything seems to be importing fine.
+
+In PgAdmin4, I'm occasionally running this and observing as row counts increase.
+
+```
+SELECT schemaname, relname AS tablename, n_live_tup AS row_count
+    FROM pg_stat_user_tables
+    WHERE schemaname = 'onet'
+    ORDER BY relname;
+```
+
+While I wait for this to process, it's time to start downloading and importing the BLS Wage dataset.
+
+## BLS Wage Dataset
+
+I'm downloading and importing these:
+
+```
+- oesm24nat.zip — National
+- oesm24st.zip — State
+- oesm24ma.zip — Metropolitan and nonmetropolitan area
+- oesm24in4.zip — National industry-specific and by ownership
+- oesm24all.zip — All data
+```
+
+## Perms Fix
+
+They all came with mixed up permissions.
+
+```
+(base) .../raw-data/bls-wage $ ls -la
+total 28
+drwxrwxr-x 7 bluesanta bluesanta 4096 Mar 29 15:30 .
+drwxrwxr-x 7 bluesanta bluesanta 4096 Mar 29 15:28 ..
+dr-xr-xr-x 2 bluesanta bluesanta 4096 Feb 24 12:36 oesm24all
+drwxrwxrwx 2 bluesanta bluesanta 4096 Mar 11  2025 oesm24in4
+dr-xr-xr-x 2 bluesanta bluesanta 4096 Feb 24 12:25 oesm24ma
+drwxrwxrwx 2 bluesanta bluesanta 4096 Mar 11  2025 oesm24nat
+dr-xr-xr-x 2 bluesanta bluesanta 4096 Jun  6  2025 oesm24st
+(base) .../raw-data/bls-wage $ chmod 755 oesm24all oesm24in4 oesm24ma oesm24nat oesm24st
+(base) .../raw-data/bls-wage $ ls
+oesm24all  oesm24in4  oesm24ma  oesm24nat  oesm24st
+(base) .../raw-data/bls-wage $
+```
+
+## Opening Up a File
+
+I opened up the `oesma24nat` file and I can see that it is properly downloaded. There's lots of interesting information.
+
+The question now is, how do I transfer this into the `bls` schema in the `train_reward_compare` db.
+
+Is there a `.xlsx` import tool for postgresql? I know there's one for pandas, but I'm trying to start with postgresql.
+
+## Importing BLS Wage Data
+
+According to Claude, the best way to do this is to simply go through Pandas and SQLAlchemy. Not a problem. 
+
+### Advice from Claude
+
+I'm still using Claude at this point. There's too much data for me to sort through all at once and I don't want to waste time getting lost in the weeds when I'm on a timeline. 
+
+Claude recommended running a simple script to look at the first five rows of the national data file before proceeding.
+
+After taking a peek, here's what Claude advised. 
+
+```
+Good structure. A few things worth noting:
+
+Useful columns for your capstone:
+- OCC_CODE — joins to O*NET's onetsoc_code (with some formatting cleanup needed)
+- OCC_TITLE — occupation name
+- TOT_EMP — total employment
+- A_MEAN, A_MEDIAN — annual mean and median wage
+- A_PCT10 through A_PCT90 — wage distribution percentiles
+- AREA, AREA_TITLE, PRIM_STATE — geography (relevant for state comparison)
+
+Things to handle on import:
+- The # values you see in A_PCT90 — BLS uses # to mean "wage exceeds $239,200" (the top-coded ceiling). You'll need to decide whether to treat these as NaN or as a known floor value
+- ANNUAL and HOURLY columns are flags indicating whether the occupation reports annual or hourly wages, not wage values — don't confuse them for numbers
+- NAICS and NAICS_TITLE are present in this file too, meaning it has some industry breakdown baked in — worth checking if this is the same data as oesm24in4 or a subset
+
+Check how many rows total:
+
+    python -c "import pandas as pd; df = pd.read_excel('national_M2024_dl.xlsx'); print(len(df), 'rows')"
+
+That'll tell us how large the full import will be.
+```

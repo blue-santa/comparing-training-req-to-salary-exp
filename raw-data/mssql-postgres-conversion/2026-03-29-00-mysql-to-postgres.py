@@ -11,8 +11,11 @@ Usage:
     # Convert all .sql files in a directory:
     python mssql_to_postgres.py --all ./db_30_2_mssql --outdir ./db_postgres
 
+    # Convert all with schema prefix (recommended):
+    python mssql_to_postgres.py --all ./db_30_2_mssql --outdir ./db_postgres --schema onet
+
     # Convert all, dry-run (print to stdout instead of writing files):
-    python mssql_to_postgres.py --all ./db_30_2_mssql --dry-run
+    python mssql_to_postgres.py --all ./db_30_2_mssql --dry-run --schema onet
 """
 
 import re
@@ -24,7 +27,7 @@ from pathlib import Path
 # Conversion rules
 # ---------------------------------------------------------------------------
 
-def convert_mssql_to_postgres(sql: str) -> str:
+def convert_mssql_to_postgres(sql: str, schema: str = None) -> str:
     """Apply all conversion rules to a MSSQL SQL string."""
 
     # 1. Remove GO statements (MSSQL batch separator, not valid in PostgreSQL)
@@ -57,16 +60,23 @@ def convert_mssql_to_postgres(sql: str) -> str:
     # 8. Collapse multiple blank lines left by GO removal into a single blank line
     sql = re.sub(r'\n{3,}', '\n\n', sql)
 
-    return sql.strip() + '\n'
+    sql = sql.strip() + '\n'
+
+    # 9. Prepend SET search_path if a schema was specified
+    if schema:
+        header = f'SET search_path TO {schema};\n\n'
+        sql = header + sql
+
+    return sql
 
 
 # ---------------------------------------------------------------------------
 # File I/O helpers
 # ---------------------------------------------------------------------------
 
-def convert_file(inpath: Path, outpath: Path, dry_run: bool = False) -> None:
+def convert_file(inpath: Path, outpath: Path, schema: str = None, dry_run: bool = False) -> None:
     original = inpath.read_text(encoding='utf-8')
-    converted = convert_mssql_to_postgres(original)
+    converted = convert_mssql_to_postgres(original, schema=schema)
 
     if dry_run:
         print(f"--- DRY RUN: {inpath.name} ---")
@@ -87,6 +97,7 @@ def main():
     parser.add_argument('input', help='Input .sql file, or input directory when --all is set')
     parser.add_argument('--all', action='store_true', help='Convert all .sql files in the input directory')
     parser.add_argument('--outdir', default='./db_postgres', help='Output directory (default: ./db_postgres)')
+    parser.add_argument('--schema', default=None, help='Prepend SET search_path TO <schema>; to each file (e.g. --schema onet)')
     parser.add_argument('--dry-run', action='store_true', help='Print output to stdout without writing files')
     args = parser.parse_args()
 
@@ -103,7 +114,7 @@ def main():
             return
         for f in sql_files:
             outpath = outdir / f.name
-            convert_file(f, outpath, dry_run=args.dry_run)
+            convert_file(f, outpath, schema=args.schema, dry_run=args.dry_run)
         if not args.dry_run:
             print(f"\nDone. {len(sql_files)} files written to {outdir}/")
     else:
@@ -111,7 +122,7 @@ def main():
             print(f"Error: {inpath} is not a file.")
             return
         outpath = outdir / inpath.name if not args.dry_run else inpath
-        convert_file(inpath, outpath, dry_run=args.dry_run)
+        convert_file(inpath, outpath, schema=args.schema, dry_run=args.dry_run)
 
 
 if __name__ == '__main__':

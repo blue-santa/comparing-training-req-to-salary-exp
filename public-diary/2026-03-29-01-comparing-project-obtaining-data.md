@@ -317,3 +317,59 @@ As we proceeded, Claude started doing some of my work for me by trying to read a
 
 I went far enough with Claude's help to verify that I was headed in the right direction, and then I turned the focus to simply helping me get the data loaded up in PostgreSQL.
 
+## Import BLS
+
+After the ONET db finished importing, I began to work on importing BLS.
+
+I am allowing Claude to give recommendations to me for the files that are most relevant for my search.
+
+```
+Clean — state folder has just one file. So our target files are:
+
+    oesm24nat/national_M2024_dl.xlsx     → bls.national
+    oesm24st/state_M2024_dl.xlsx         → bls.state
+    oesm24ma/MSA_M2024_dl.xlsx           → bls.metro
+    oesm24ma/BOS_M2024_dl.xlsx           → bls.balance_of_state
+    oesm24in4/natsector_M2024_dl.xlsx    → bls.national_by_sector
+
+Before writing the loader, let's quickly check if the state and sector files share the same column structure as national:
+
+    python -c "
+    import pandas as pd
+    nat = pd.read_excel('oesm24nat/national_M2024_dl.xlsx', nrows=0).columns.tolist()
+    st = pd.read_excel('oesm24st/state_M2024_dl.xlsx', nrows=0).columns.tolist()
+    sec = pd.read_excel('oesm24in4/natsector_M2024_dl.xlsx', nrows=0).columns.tolist()
+    msa = pd.read_excel('oesm24ma/MSA_M2024_dl.xlsx', nrows=0).columns.tolist()
+    print('NAT:', nat)
+    print()
+    print('STATE:', st)
+    print()
+    print('SECTOR:', sec)
+    print()
+    print('MSA:', msa)
+    "
+
+If they all share the same columns we can write one generic loader for all of them.
+```
+
+By Claude's recommendation, we checked to see the column structure across the files that we wanted to import.
+
+```
+(homl_env) .../raw-data/bls-wage $ python check-bls-columns.py
+NAT: ['AREA', 'AREA_TITLE', 'AREA_TYPE', 'PRIM_STATE', 'NAICS', 'NAICS_TITLE', 'I_GROUP', 'OWN_CODE', 'OCC_CODE', 'OCC_TITLE', 'O_GROUP', 'TOT_EMP', 'EMP_PRSE', 'JOBS_1000', 'LOC_QUOTIENT', 'PCT_TOTAL', 'PCT_RPT', 'H_MEAN', 'A_MEAN', 'MEAN_PRSE', 'H_PCT10', 'H_PCT25', 'H_MEDIAN', 'H_PCT75', 'H_PCT90', 'A_PCT10', 'A_PCT25', 'A_MEDIAN', 'A_PCT75', 'A_PCT90', 'ANNUAL', 'HOURLY']
+
+STATE: ['AREA', 'AREA_TITLE', 'AREA_TYPE', 'PRIM_STATE', 'NAICS', 'NAICS_TITLE', 'I_GROUP', 'OWN_CODE', 'OCC_CODE', 'OCC_TITLE', 'O_GROUP', 'TOT_EMP', 'EMP_PRSE', 'JOBS_1000', 'LOC_QUOTIENT', 'PCT_TOTAL', 'PCT_RPT', 'H_MEAN', 'A_MEAN', 'MEAN_PRSE', 'H_PCT10', 'H_PCT25', 'H_MEDIAN', 'H_PCT75', 'H_PCT90', 'A_PCT10', 'A_PCT25', 'A_MEDIAN', 'A_PCT75', 'A_PCT90', 'ANNUAL', 'HOURLY']
+
+SECTOR: ['AREA', 'AREA_TITLE', 'AREA_TYPE', 'PRIM_STATE', 'NAICS', 'NAICS_TITLE', 'I_GROUP', 'OWN_CODE', 'OCC_CODE', 'OCC_TITLE', 'O_GROUP', 'TOT_EMP', 'EMP_PRSE', 'JOBS_1000', 'LOC_QUOTIENT', 'PCT_TOTAL', 'PCT_RPT', 'H_MEAN', 'A_MEAN', 'MEAN_PRSE', 'H_PCT10', 'H_PCT25', 'H_MEDIAN', 'H_PCT75', 'H_PCT90', 'A_PCT10', 'A_PCT25', 'A_MEDIAN', 'A_PCT75', 'A_PCT90', 'ANNUAL', 'HOURLY']
+
+MSA: ['AREA', 'AREA_TITLE', 'AREA_TYPE', 'PRIM_STATE', 'NAICS', 'NAICS_TITLE', 'I_GROUP', 'OWN_CODE', 'OCC_CODE', 'OCC_TITLE', 'O_GROUP', 'TOT_EMP', 'EMP_PRSE', 'JOBS_1000', 'LOC_QUOTIENT', 'PCT_TOTAL', 'PCT_RPT', 'H_MEAN', 'A_MEAN', 'MEAN_PRSE', 'H_PCT10', 'H_PCT25', 'H_MEDIAN', 'H_PCT75', 'H_PCT90', 'A_PCT10', 'A_PCT25', 'A_MEDIAN', 'A_PCT75', 'A_PCT90', 'ANNUAL', 'HOURLY']
+(homl_env) .../raw-data/bls-wage $
+```
+
+They're all identical.
+
+## Stepping Away from Claude
+
+At this point, Claude pushed on ahead and wrote a script that did the entire import and data cleaning process for me.
+
+Handy as that is, I do want to practice on my own, so I am not reading the script and am instead practicing what I've learned.

@@ -15,3 +15,19 @@ I was able to get the Nat sheet for Field Descriptions initially sorted into the
 I used a lot of Google for finding pandas functions. 
 
 Getting the index and column names figured out took a bit.
+
+---
+
+I was able to get all five of the BLS data files roughly established in a pandas df. 
+
+From here, next steps would be to push this initial rough data to psotgres, before making any further changes.
+
+I'm not sure what kinds of issues may crop up. There's null values, atypical type values, etc. How to deal with that is going to be a challenge.
+
+The general idea is to have a starting point that's as fresh and close to the original as possible. Then, with each stage, I will create a set of meta data, adapted according to the progress I make towards the end goal. 
+
+Another key part of the idea is that each time I go from stages in the data, I pull the previous stage of the data out of postgres into jupyter, make changes, then push it back into a new schema or something. 
+
+That way, if I discover I've done something wrong, I can go back in stages, rewrite the jupyter notebook code associated, and rerun from that stage going forward.
+
+This may not work in a live production environment with updating data, but it seems to be the right approach for this static dataset.

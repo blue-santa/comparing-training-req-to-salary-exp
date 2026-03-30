@@ -312,3 +312,8 @@ Check how many rows total:
 
 That'll tell us how large the full import will be.
 ```
+
+As we proceeded, Claude started doing some of my work for me by trying to read and join the data. I appreciate that it can do this work so quickly, but I don't want it to take away from the learning experience.
+
+I went far enough with Claude's help to verify that I was headed in the right direction, and then I turned the focus to simply helping me get the data loaded up in PostgreSQL.
+

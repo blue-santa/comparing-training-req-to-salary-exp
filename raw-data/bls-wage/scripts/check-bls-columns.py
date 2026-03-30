@@ -1,0 +1,12 @@
+import pandas as pd
+nat = pd.read_excel('oesm24nat/national_M2024_dl.xlsx', nrows=0).columns.tolist()
+st = pd.read_excel('oesm24st/state_M2024_dl.xlsx', nrows=0).columns.tolist()
+sec = pd.read_excel('oesm24in4/natsector_M2024_dl.xlsx', nrows=0).columns.tolist()
+msa = pd.read_excel('oesm24ma/MSA_M2024_dl.xlsx', nrows=0).columns.tolist()
+print('NAT:', nat)
+print()
+print('STATE:', st)
+print()
+print('SECTOR:', sec)
+print()
+print('MSA:', msa)

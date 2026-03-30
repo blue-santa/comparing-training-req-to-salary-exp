@@ -372,4 +372,34 @@ They're all identical.
 
 At this point, Claude pushed on ahead and wrote a script that did the entire import and data cleaning process for me.
 
-Handy as that is, I do want to practice on my own, so I am not reading the script and am instead practicing what I've learned.
+Handy as that is, I do want to practice on my own, so I am not reading the script and am instead practicing what I've learned
+
+## Help to Connect Server to Desktop
+
+I have two machines connected via my wifi router. My desktop has the postgresql database. This machine is very old, but it has all my data.
+
+I have another machine that's connected via ethernet, and this one has a newer CPU etc.
+
+I connect the two via ssh tunnels.
+
+I'm running jupyter notebook on the external machine and then access it in my desktop browser.
+
+Claude helped a lot with getting all the port forwarding and tunnels set up.
+
+Jupyter Notebook runs as a kernel on the external machine, my Chrome browser accesses the external kernel via ssh.
+
+The external machine accesses the postgresql database on my desktop via a reverse ssh tunnel.
+
+Claude helped me understand that the ssh tunnel needs `-R` instead of `-L`, so that the tunnel works in reverse.
+
+We ran a test connection via SQLAlchemy, and we're getting the correct number of rows returned from the db.
+
+Back to working on my own a bit.
+
+---
+
+I was able to get all of the Excel files imported using some of the notes from my work with DataCamp.
+
+I can access the data and see the results from `...head()`. 
+
+From here, I'm going to step away from AI assistance, as much as possible.

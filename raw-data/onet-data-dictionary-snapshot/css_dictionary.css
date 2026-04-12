@@ -1,0 +1,151 @@
+DIV.crumb {
+  font-size: 11px;
+  font-weight: bold;
+  margin-top: 1.4em;
+}
+DIV.crumb A {
+  text-decoration: none;
+}
+
+H2 {
+  margin-top: 0.2em;
+}
+
+/* TABLE {
+  border-collapse: separate !important;
+}
+TD {
+  margin: 3px;
+  padding: 3px 9px 3px 3px;
+}
+TH {
+  margin: 3px;
+  padding: 3px 6px;
+  text-align: left;
+  vertical-align: bottom;
+}   */
+
+TD[align=right], TH[align=right] {
+  text-align: right;
+}
+TD[align=center], TH[align=center] {
+  text-align: center;
+}
+TD[valign=bottom], TH[valign=bottom] {
+  vertical-align: bottom;
+}
+
+/* DIV.ColumnStructure TABLE {
+  width: 90%;
+} */
+DIV.ColumnStructure TR TD:first-child {
+  width: 12em;
+}
+DIV.ColumnStructure TR TD:nth-child(2) {
+  width: 12em;
+}
+/* DIV.StructureChanges TABLE {
+  width: 60%;
+} */
+DIV.StructureChanges TR TD:first-child {
+  width: 8em;
+}
+
+DIV.Historical TH,
+DIV.RelationshipsSmall TH,
+DIV.Historical TD,
+DIV.RelationshipsSmall TD {
+  font-size: x-small;
+  text-align: center;
+  vertical-align: middle;
+  /* padding: 3px 6px;
+  border-bottom: solid #eee 1px; */
+}
+
+DIV.Historical TD.RelationshipHeader,
+DIV.Historical TD.RelationshipHeaderWhite,
+DIV TD.RelationshipHeader,
+TD.RelationshipHeaderWhite {
+  font-weight: bold;
+  background: #eee;
+  /* border-bottom: solid #ccc 1px; */
+  text-align: left;
+  vertical-align: middle;
+  /* padding: 3px 9px 3px 3px; */
+}
+
+/* DIV.Historical TD,
+DIV.ColumnStructure TD,
+DIV.StructureChanges TD,
+DIV.DataExample TD {
+  border-bottom:    solid #ddd 1px;
+} */
+
+/* DIV.DataExample TABLE {
+  border-collapse: collapse !important;
+} */
+DIV.DataExample TH, DIV.DataExample TD {
+  font-size: small;
+  text-align: left;
+  /* margin: 0;
+  border-collapse: collapse;
+  border: solid #ccc 1px;
+  padding: 3px 6px; */
+}
+
+DIV.ColumnStructure TD.Metadata {
+  background: #f4f4f4;
+}
+DIV.ColumnStructure TD.RecommendedMetadata {
+  font-weight: bold;
+}
+
+DIV.NotDataTable TD, DIV.NotDataTableSmall TD {
+  border: none;
+  background: transparent;
+}
+DIV.NotDataTable TR TD:first-child {
+  width: 6em;
+}
+
+/* DIV.Historical TH {
+  border-bottom: solid #ccc 1px;
+} */
+DIV.Historical TD {
+  text-align: center;
+  /* padding: 3px 6px; */
+}
+DIV.Historical TD.NotPresent {
+  background: #eee;
+}
+TABLE TD.auto-generated {
+  border: none;
+}
+
+DIV.table-title {
+  font-size: medium;
+  font-weight: bold;
+  margin: 1em 0 0.5em;
+}
+
+DIV.Historical TD.RelationshipHeader EM,
+A.xref I {
+  font-style: normal;
+}
+EM A.xref I {
+  font-style: italic;
+}
+
+UL.itemizedlist LI.listitem {
+  margin-bottom: 0.3em;
+  margin-top: 0.3em;
+}
+
+HR {
+  border: none;
+  height: 1px;
+  background: #ccc;
+}
+/* DIV.navheader TD, DIV.navfooter TD {
+  background: transparent;
+} */

@@ -31,3 +31,9 @@ Another key part of the idea is that each time I go from stages in the data, I p
 That way, if I discover I've done something wrong, I can go back in stages, rewrite the jupyter notebook code associated, and rerun from that stage going forward.
 
 This may not work in a live production environment with updating data, but it seems to be the right approach for this static dataset.
+
+I used this command to convert the docs to html for my wordpress blog:
+
+```
+jupyter nbconvert --to html 01-01-wrangling-onet-train-reward-compare.ipynb
+```

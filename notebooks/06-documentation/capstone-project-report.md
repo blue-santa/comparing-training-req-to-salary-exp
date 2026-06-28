@@ -115,6 +115,20 @@ Finally, with a model selected, we generated and plotted predictions.
 
 The first visualization shows predictions plotted against actual values from the test dataset.
 
-![Linear Regression Predictions vs. Actual Values](lr_pred_vs_actual.png)
+![Predictions vs. Actual](lr_pred_vs_actual.png)
 
-The second visualization includes a 
+The second visualization includes a Linear Regression against actual values.
+
+![Linear Regression Plot](lr_reg_pred_vs_actual.png)
+
+# Conclusion
+
+There is a positive correlation between the value respondents place on higher levels of education and an increase in average annual salary.
+
+However, while the linear-regression model is useful, there is not a definitive correlation.
+
+This is logical, because some careers require skills that are difficult to teach, if not impossible. For example, CEOs require more than just mathematical learning; they require leadership, which is a truly difficult concept to translate into a classroom curriculum.
+
+Another example can be found with sports athletes. Professional athletes make exorbant amounts of income, but may not need an education beyond high school.
+
+Therefore, education does seem to have value overall, but it is not an ultimate factor in an individual person's earning potential.

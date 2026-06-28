@@ -65,8 +65,56 @@ Data was processed in stages, starting in its original form, then inserted into 
 
 We performed exploratory data analysis to get a better idea of the data.
 
+## Observing Career Financial Outcomes in Isolation
+
 The following image shows a general breakdown of career categories and their overall financial expectations.
 
 ![Career Financial Expectations](2026-06-27-00-a_mean_vs_occ_title.png)
 
+The two highest career paths are Management and Legal Occupations.
 
+## Comparing Educational Investment to Outcome
+
+As an initial foray into the analysis, we compared educational investment levels to financial outcome.
+
+In order to achieve this, we took the O*NET data that indicated the level of schooling survey respondents stated were necessary for success and cross-referenced them to the same categories of financial outcomes in the BLS wage data.
+
+![Educational Investment vs. Financial Outcome](2026-06-28-education-sum-vs-a-mean.png)
+
+As shown in the chart, more education generally improved outcome, but the results were not entirely linear.
+
+Some careers show exorbent returns early on in the growth path, while other careers require significant investment for only modest returns.
+
+# Preprocessing, Training
+
+We then pulled our data into a new notebook where we focused on preprocessing and training the data.
+
+As a part of preprocessing, we created dummy variables for each of the `major` and `minor` career categories.
+
+We used the `StandardScaler()` tool from scikit-learn to ensure the data was scaled properly.
+
+We then split the data into training and test sets, and repeated this process for each model as needed.
+
+# Modeling
+
+The modeling stage took three different models into account.
+
+- Linear Regression
+  - This model had a `0.795` R^2 score
+- Ordinary Least Squares
+  - This model also had a `0.795` R^2 score
+  - This model had an extremely high condition number, which is a sign of severe multicolinearity
+  - Therefore, this model was deemed less effective than the Linear Regression Model
+- Ridge Regression
+  - This model produced an R^2 score of `0.601`
+  - Because this R^2 score was substantially lower, this model is also not the ideal candidate
+
+# Modeling and Visualization
+
+Finally, with a model selected, we generated and plotted predictions.
+
+The first visualization shows predictions plotted against actual values from the test dataset.
+
+![Linear Regression Predictions vs. Actual Values](lr_pred_vs_actual.png)
+
+The second visualization includes a 
